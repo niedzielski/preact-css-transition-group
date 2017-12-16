@@ -38,6 +38,7 @@
     "url": "http://github.com/developit/preact-css-transition-group/issues"
   },
   "license": "MIT",
+  "types": "src/index.d.ts",
   "devDependencies": {
     "babel-core": "^6.6.4",
     "babel-eslint": "^6.1.2",
