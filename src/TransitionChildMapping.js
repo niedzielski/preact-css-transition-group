@@ -66,6 +66,9 @@ export function mergeChildMappings(prev, next) {
 		let key = getKey(c);
 		if (nextChildrenPending.hasOwnProperty(key)) {
 			ret = ret.concat(nextChildrenPending[key]);
+		} else if (pendingChildren.length) {
+			ret = ret.concat(pendingChildren);
+			pendingChildren = [];
 		}
 		ret.push(c);
 	});

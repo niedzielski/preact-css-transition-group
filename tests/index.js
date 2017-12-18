@@ -51,6 +51,12 @@ class TodoList extends Component {
 	}
 }
 
+class TodoListWithOneItem extends TodoList {
+	state = {
+		items: ['hello']
+	};
+}
+
 class TodoListWithTimeout extends Component {
 	state = {
 		items: ['hello', 'world', 'click', 'me']
@@ -152,8 +158,121 @@ class NullChildren extends Component {
 
 const Nothing = () => null;
 
+describe('CSSTransitionGroup: one item', () => {
+	let container = document.createElement('div'),
+		list, root;
+	document.body.appendChild(container);
 
-describe('CSSTransitionGroup', () => {
+	let $ = s => [].slice.call(container.querySelectorAll(s));
+
+	beforeEach( () => {
+		root = render(<div><Nothing /></div>, container, root);
+		root = render(<div><TodoListWithOneItem ref={c => list=c} /></div>, container, root);
+	});
+
+	afterEach( () => {
+		list = null;
+	});
+
+	it('create works', () => {
+		expect($('.item')).to.have.length(1);
+	});
+
+	it('transitionLeave works', done => {
+		// this.timeout(5999);
+		list.handleRemove(0);
+
+		// make sure -leave class was added
+		setTimeout( () => {
+			expect($('.item')).to.have.length(1);
+
+			expect($('.item')[0].className).to.contain('example-leave');
+			expect($('.item')[0].className).to.contain('example-leave-active');
+		}, 100);
+
+		// then make sure it's gone
+		setTimeout( () => {
+			expect($('.item')).to.have.length(0);
+			done();
+		}, 1400);
+	});
+
+	it('transitionEnter works', done => {
+		// this.timeout(5999);
+		list.handleAdd(Date.now());
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(2);
+
+			expect($('.item')[1].className).to.contain('example-enter');
+			expect($('.item')[1].className).to.contain('example-enter-active');
+		}, 500);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(2);
+
+			expect($('.item')[1].className).not.to.contain('example-enter');
+			expect($('.item')[1].className).not.to.contain('example-enter-active');
+			expect($('.item')[1].className).not.to.contain('example-leave');
+			expect($('.item')[1].className).not.to.contain('example-leave-active');
+
+			done();
+		}, 1400);
+	});
+
+	it('transitionEnter then transitionLeave works', done => {
+		// this.timeout(5999);
+		list.handleAdd(Date.now());
+		list.handleRemove(0);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(2);
+
+			expect($('.item')[0].className).to.contain('example-leave');
+			expect($('.item')[0].className).to.contain('example-leave-active');
+			expect($('.item')[1].className).to.contain('example-enter');
+			expect($('.item')[1].className).to.contain('example-enter-active');
+		}, 100);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(1);
+
+			expect($('.item')[0].className).not.to.contain('example-enter');
+			expect($('.item')[0].className).not.to.contain('example-enter-active');
+			expect($('.item')[0].className).not.to.contain('example-leave');
+			expect($('.item')[0].className).not.to.contain('example-leave-active');
+			
+			done();
+		}, 1400);
+
+	});
+
+	it('transitionLeave then transitionEnter works', done => {
+		// this.timeout(5999);
+		list.handleRemove(0);
+		list.handleAdd(Date.now());
+		
+		setTimeout( () => {
+			expect($('.item')).to.have.length(2);
+
+			expect($('.item')[0].className).to.contain('example-leave');
+			expect($('.item')[0].className).to.contain('example-leave-active');
+			expect($('.item')[1].className).to.contain('example-enter');
+			expect($('.item')[1].className).to.contain('example-enter-active');
+		}, 100);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(1);
+			expect($('.item')[0].className).not.to.contain('example-enter');
+			expect($('.item')[0].className).not.to.contain('example-enter-active');
+			expect($('.item')[0].className).not.to.contain('example-leave');
+			expect($('.item')[0].className).not.to.contain('example-leave-active');
+			done();
+		}, 1400);
+	});
+});
+
+describe('CSSTransitionGroup: multiple items', () => {
 	let container = document.createElement('div'),
 		list, root;
 	document.body.appendChild(container);
@@ -208,7 +327,60 @@ describe('CSSTransitionGroup', () => {
 
 			expect($('.item')[4].className).not.to.contain('example-enter');
 			expect($('.item')[4].className).not.to.contain('example-enter-active');
+			expect($('.item')[4].className).not.to.contain('example-leave');
+			expect($('.item')[4].className).not.to.contain('example-leave-active');
 
+			done();
+		}, 1400);
+	});
+
+	it('transitionEnter then transitionLeave works', done => {
+		// this.timeout(5999);
+		list.handleAdd(Date.now());
+		list.handleRemove(0);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(5);
+
+			expect($('.item')[0].className).to.contain('example-leave');
+			expect($('.item')[0].className).to.contain('example-leave-active');
+			expect($('.item')[4].className).to.contain('example-enter');
+			expect($('.item')[4].className).to.contain('example-enter-active');
+		}, 100);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(4);
+
+			expect($('.item')[3].className).not.to.contain('example-enter');
+			expect($('.item')[3].className).not.to.contain('example-enter-active');
+			expect($('.item')[3].className).not.to.contain('example-leave');
+			expect($('.item')[3].className).not.to.contain('example-leave-active');
+
+			done();
+		}, 1400);
+
+	});
+
+	it('transitionLeave then transitionEnter works', done => {
+		// this.timeout(5999);
+		list.handleRemove(0);
+		list.handleAdd(Date.now());
+		
+		setTimeout( () => {
+			expect($('.item')).to.have.length(5);
+
+			expect($('.item')[0].className).to.contain('example-leave');
+			expect($('.item')[0].className).to.contain('example-leave-active');
+			expect($('.item')[4].className).to.contain('example-enter');
+			expect($('.item')[4].className).to.contain('example-enter-active');
+		}, 100);
+
+		setTimeout( () => {
+			expect($('.item')).to.have.length(4);
+			expect($('.item')[3].className).not.to.contain('example-enter');
+			expect($('.item')[3].className).not.to.contain('example-enter-active');
+			expect($('.item')[3].className).not.to.contain('example-leave');
+			expect($('.item')[3].className).not.to.contain('example-leave-active');
 			done();
 		}, 1400);
 	});
